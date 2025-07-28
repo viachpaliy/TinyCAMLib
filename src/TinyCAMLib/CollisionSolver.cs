@@ -93,8 +93,8 @@ namespace TinyCAMLib
                     return CheckConeCollision(position, cutter.Radius, cutter.CutterLength, surface);
                 
                 case MillingCutterType.TaperedBallNose:
-                    Vector3 center = position + new Vector3(0, 0, cutter.TipRadius);
-                    return CheckSphereCollision(center, cutter.TipRadius, surface);
+                    Vector3 tipCenter = position + new Vector3(0, 0, cutter.TipRadius);
+                    return CheckSphereCollision(tipCenter, cutter.TipRadius, surface);
 
                 default:
                     return false;
