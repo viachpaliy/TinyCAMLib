@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B9D5667D-8E7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TinyCAMLib", "src\TinyCAMLib\TinyCAMLib.csproj", "{3E27D95D-5023-4481-A892-BFC518F22D67}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{6F413A80-4AC8-4B50-8EBE-174544C09464}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimplePostProcessor", "examples\SimplePostProcessor\SimplePostProcessor.csproj", "{D667E672-752F-4AA3-B137-91DC58C20B5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{3E27D95D-5023-4481-A892-BFC518F22D67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E27D95D-5023-4481-A892-BFC518F22D67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E27D95D-5023-4481-A892-BFC518F22D67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D667E672-752F-4AA3-B137-91DC58C20B5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D667E672-752F-4AA3-B137-91DC58C20B5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D667E672-752F-4AA3-B137-91DC58C20B5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D667E672-752F-4AA3-B137-91DC58C20B5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3E27D95D-5023-4481-A892-BFC518F22D67} = {B9D5667D-8E70-4304-BE61-B96E150A6F7C}
+		{D667E672-752F-4AA3-B137-91DC58C20B5C} = {6F413A80-4AC8-4B50-8EBE-174544C09464}
 	EndGlobalSection
 EndGlobal
