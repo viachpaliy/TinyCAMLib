@@ -24,7 +24,20 @@ namespace TinyCAMLib
         public static float? CalculateCollision(MillingCutter cutter, STLSurf surface, float x, float y, 
             float startZ, float endZ, float precision = 0.01f)
         {
-            if (surface.TriangleCount == 0)
+            // Create bounding box for the milling cutter 
+            
+            Vector3 bottomMin = new Vector3(x - cutter.Radius, y - cutter.Radius, endZ);
+            Vector3 topMax = new Vector3(x + cutter.Radius, y + cutter.Radius, startZ)  ;
+            Bbox cutterBbox = new Bbox(bottomMin, topMax);
+            STLSurf smallSurface = new STLSurf();
+            foreach (var triangle in surface.Triangles)
+            {
+                // Quick bounding box check first
+                Bbox triangleBbox = new Bbox(triangle);
+                if (cutterBbox.Intersects(triangleBbox))
+                    smallSurface.AddTriangle(triangle);
+            }
+            if (smallSurface.TriangleCount == 0)
                 return null;
 
             // Ensure startZ > endZ for downward movement
@@ -37,9 +50,9 @@ namespace TinyCAMLib
             // Check if there's any collision in the range
             Vector3 startPosition = new Vector3(x, y, highZ);
             Vector3 endPosition = new Vector3(x, y, lowZ);
-            
-            bool hasCollisionAtStart = HasCollision(cutter, startPosition, surface);
-            bool hasCollisionAtEnd = HasCollision(cutter, endPosition, surface);
+
+            bool hasCollisionAtStart = HasCollision(cutter, startPosition, smallSurface);
+            bool hasCollisionAtEnd = HasCollision(cutter, endPosition, smallSurface);
 
             // If no collision at end, there might be no collision at all
             if (!hasCollisionAtEnd)
@@ -55,7 +68,7 @@ namespace TinyCAMLib
                 float midZ = (highZ + lowZ) * 0.5f;
                 Vector3 midPosition = new Vector3(x, y, midZ);
 
-                if (HasCollision(cutter, midPosition, surface))
+                if (HasCollision(cutter, midPosition, smallSurface))
                 {
                     // Collision found at midZ, search in upper half
                     lowZ = midZ;
@@ -110,18 +123,10 @@ namespace TinyCAMLib
         /// <returns>True if collision detected.</returns>
         private static bool CheckSphereCollision(Vector3 center, float radius, STLSurf surface)
         {
-            // Create bounding box for the sphere
-            Vector3 radiusVector = new Vector3(radius);
-            Bbox sphereBbox = new Bbox(center - radiusVector, center + radiusVector);
-
+           
             foreach (var triangle in surface.Triangles)
             {
-                // Quick bounding box check first
-                Bbox triangleBbox = new Bbox(triangle);
-                if (!sphereBbox.Intersects(triangleBbox))
-                    continue;
-
-                // Expensive geometric check only for potential candidates
+                               
                 float distance = DistancePointToTriangle(center, triangle);
                 if (distance <= radius)
                 {
@@ -141,20 +146,9 @@ namespace TinyCAMLib
         /// <returns>True if collision detected.</returns>
         private static bool CheckCylinderCollision(Vector3 tipPosition, float radius, float length, STLSurf surface)
         {
-            // Create bounding box for the cylinder
-            Vector3 radiusVector = new Vector3(radius, radius, 0);
-            Vector3 bottomMin = tipPosition - radiusVector;
-            Vector3 topMax = tipPosition + new Vector3(radius, radius, length);
-            Bbox cylinderBbox = new Bbox(bottomMin, topMax);
-
-            foreach (var triangle in surface.Triangles)
+                foreach (var triangle in surface.Triangles)
             {
-                // Quick bounding box check first
-                Bbox triangleBbox = new Bbox(triangle);
-                if (!cylinderBbox.Intersects(triangleBbox))
-                    continue;
-
-                // Check flat bottom circle
+                 // Check flat bottom circle
                 if (TriangleIntersectsCircle(triangle, tipPosition, radius, Vector3.UnitZ))
                 {
                     return true;
@@ -181,24 +175,11 @@ namespace TinyCAMLib
         /// <returns>True if collision detected.</returns>
         private static bool CheckConeCollision(Vector3 tipPosition, float baseRadius, float height, STLSurf surface)
         {
-            // Create bounding box for the cone
-            Vector3 radiusVector = new Vector3(baseRadius, baseRadius, 0);
-            Vector3 bottomMin = tipPosition - new Vector3(0, 0, 0); // Tip point
-            Vector3 topMax = tipPosition + new Vector3(baseRadius, baseRadius, height);
-            Vector3 bottomMinExtended = new Vector3(tipPosition.X - baseRadius, tipPosition.Y - baseRadius, tipPosition.Z);
-            Bbox coneBbox = new Bbox(
-                Vector3.Min(bottomMin, bottomMinExtended), 
-                topMax
-            );
-
+   
             Vector3 baseCenter = tipPosition + new Vector3(0, 0, height);
             
             foreach (var triangle in surface.Triangles)
             {
-                // Quick bounding box check first
-                Bbox triangleBbox = new Bbox(triangle);
-                if (!coneBbox.Intersects(triangleBbox))
-                    continue;
 
                 // Expensive geometric check only for potential candidates
                 if (TriangleIntersectsCone(triangle, tipPosition, baseCenter, baseRadius))
